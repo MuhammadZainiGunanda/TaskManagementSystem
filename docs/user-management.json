@@ -1,0 +1,522 @@
+{
+     "openapi":"3.0.2",
+     "info": {
+          "version":"1.0",
+          "title":"Task Management System RESTful API",
+          "contact": {
+               "name": "Muhammad Zaini Gunanda",
+               "email": "muhammadzainigunanda@gmail.com"
+          }
+     },
+     "servers": [
+          {
+               "url":"http://localhost:3000/"
+          }
+     ],
+     "paths": {
+          "/api/v1/users/register": {
+               "post" : {
+                    "tags": ["User Management"],
+                    "summary": "User Registration",
+                    "description": "Endpoint to register new users with username, email, and password",
+                    "requestBody": {
+                         "content": {
+                              "application/json": {
+                                   "schema": {
+                                        "type" : "object",
+                                        "properties": {
+                                             "username":{
+                                                  "required": true,
+                                                  "type": "string",
+                                                  "maximum": 255,
+                                                  "minimum": 5
+                                             },
+                                             "email":{
+                                                  "required": true,
+                                                  "type": "string",
+                                                  "maximum": 255,
+                                                  "minimum": 5
+                                             },
+                                             "password":{
+                                                  "required": true,
+                                                  "type": "string",
+                                                  "maximum": 255,
+                                                  "minimum": 5
+                                             }
+                                        }
+                                   },
+                                   "example": {
+                                        "username": "exampleusername",
+                                        "email": "example@example.com",
+                                        "password": "ExamplePassword123"
+                                   }
+                              }
+                         }
+                    },
+                    "responses": {
+                         "200": {
+                              "description": "Success response with user data",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": true,
+                                             "message": "Register successfully",
+                                             "data": {
+                                                  "username": "exampleusername",
+                                                  "email": "example@example.com"
+                                             }
+                                        }
+                                   }
+                              }
+                         },
+                         "403": {
+                              "description": "Bad Request: Validation Failed",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Validation failed. Please check your input.",
+                                             "errors": [
+                                                  {
+                                                       "path": "username",
+                                                       "message": "String must contain at least 5 character"
+                                                  },
+                                                  {
+                                                       "path": "email",
+                                                       "message": "Invalid input must end with '.com'"
+                                                  },
+                                                  {
+                                                       "path": "password",
+                                                       "message": "String must contain at least 5 character"
+                                                  }
+                                             ],
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "400": {
+                              "description": "Bad Request: Conflict User Already Exists",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "User already exists",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "500": {
+                              "description": "Internal Server Errors",
+                              "content": {
+                                   "application/json":{
+                                        "example": {
+                                             "success": false,
+                                             "message": "Internal server errors",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         }
+                    }
+               }
+          },
+
+
+          "/api/v1/users/login": {
+               "post": {
+                    "tags": ["User Management"],
+                    "summary": "User Login",
+                    "description": "Endpoint for Authentication of logged-in users",
+                    "requestBody" : {
+                         "content": {
+                              "application/json": {
+                                   "schema": {
+                                        "type": "object",
+                                        "properties": {
+                                             "email": {
+                                                  "type": "string",
+                                                  "minimum": 5,
+                                                  "maximum": 255,
+                                                  "required": [true]
+                                             },
+                                             "password": {
+                                                  "type": "string",
+                                                  "minimum": 5,
+                                                  "maximum": 255,
+                                                  "required": [true]
+                                             }
+                                        }
+                                   },
+                                   "example": {
+                                        "email": "example@example.com",
+                                        "password": "ExamplePassword123"
+                                   }
+                              }
+                         }
+                    },
+                    "responses": {
+                         "200": {
+                              "description": "Successful login user",
+                              "headers": {
+                                   "Set-Cookie": {
+                                        "description": "JWT token for Authentication",
+                                        "schema": {
+                                             "type": "string"
+                                        },
+                                        "example": "Login <JWT Token Here>; Path=/; HttpOnly; SameSite=Strict"
+                                   }
+                              },
+                              "content": {
+                                   "application/json":{
+                                        "example": {
+                                             "success": true,
+                                             "message": "User logged in successfully",
+                                             "data": {
+                                                  "username" : "exampleusername",
+                                                  "email": "example@example.com"
+                                             }
+                                        }
+                                   }
+                              }
+                         },
+                         "403": {
+                              "description": "Bad request: Validation Failed",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Validation failed. Please check your input.",
+                                             "errors": [
+                                                  {
+                                                       "path": "email",
+                                                       "message": "Invalid input must end with '.com'"
+                                                  },
+                                                  {
+                                                       "path": "password",
+                                                       "message": "String must contain at lesat 5 character"
+                                                  }
+                                             ]
+                                        }
+                                   }
+                              }
+                         },
+                         "400": {
+                              "description": "Bad request: Email Or Password Is Wrong",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Email or password is wrong",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "500": {
+                              "description": "Internal Server Errors",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Server internal errors",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         }
+
+                    }
+               }
+          },
+
+
+          "/api/v1/users/me": {
+               "get": {
+                    "tags": ["User Management"],
+                    "summary": "User profile",
+                    "description": "Endpoint to retrieve the profile of the currently logged-in user.",
+                    "parameters": [
+                         {
+                              "name": "Authorization",
+                              "in": "header",
+                              "description": "JWT token for Authentication",
+                              "required": true,
+                              "schema": {
+                                   "type": "string"
+                              }
+                         }
+                    ],
+                    "responses": {
+                         "200": {
+                              "description": "Successful Get profile",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": true,
+                                             "message": "User data retrieved successfully",
+                                             "data": {
+                                                  "username": "exampleusername",
+                                                  "email": "example@example.com"
+                                             }
+                                        }
+                                   }
+                              }
+                         },
+                         "401": {
+                              "description": "Unauthorized: Missing or invalid token",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Access denied",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "500": {
+                              "description": "Internal Server Errors",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Server internal errors",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         }
+                    }
+               },
+
+               "put": {
+                    "tags": ["User Management"],
+                    "summary": "Update User Profile",
+                    "description": "Endpoint to update user profile data.",
+                    "parameters": [
+                         {
+                              "name": "Authorization",
+                              "in": "header",
+                              "description": "JWT token for Authentication",
+                              "required": true,
+                              "schema": {
+                                   "type": "string"
+                              }
+                         }
+                    ],
+                    "requestBody" : {
+                         "content": {
+                              "application/json": {
+                                   "schema": {
+                                        "type": "object",
+                                        "properties": {
+                                             "username": {
+                                                  "type": "string",
+                                                  "minimum": 5,
+                                                  "maximum": 255,
+                                                  "required": false
+                                             },
+                                             "password": {
+                                                  "type": "string",
+                                                  "minimum": 5,
+                                                  "maximum": 255,
+                                                  "required": false
+                                             }
+                                        }
+                                   },
+                                   "example": {
+                                        "username": "exampleusername",
+                                        "email": "newemail@example.com"
+                                   }
+                              }
+                         }
+                    },
+                    "responses": {
+                         "200": {
+                              "description": "Successful updating profile",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": true,
+                                             "message": "User data updated successfully",
+                                             "data": {
+                                                  "username": "newusername",
+                                                  "email": "newemail@example.com"
+                                             }
+                                        }
+                                   }
+                              }
+                         },
+                         "401": {
+                              "description": "Unauthorized: Missing or invalid token",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Access denied",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "403": {
+                              "description": "Bad Request: Validation failed",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Validation failed. Please check your input.",
+                                             "errors": [
+                                                  {
+                                                       "path": "username",
+                                                       "message": "String must contain at least 5 character"
+                                                  },
+                                                  {
+                                                       "path": "email",
+                                                       "message": "Invalid input must end with '.com'"
+                                                  }
+                                             ]
+                                        }
+                                   }
+                              }
+                         },
+                         "500": {
+                              "description": "Internal Server Errors",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Internal server errors",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         }
+                    }
+               }
+          },
+
+
+          "/api/v1/users/change-password": {
+               "put": {
+                    "tags": ["User Management"],
+                    "summary": "Change password User Profile",
+                    "description": "Endpoint to change password user profile data.",
+                    "parameters": [
+                         {
+                              "name": "Authorization",
+                              "in": "header",
+                              "description": "JWT token for Authentication",
+                              "required": true,
+                              "schema": {
+                                   "type": "string"
+                              }
+                         }
+                    ],
+                    "requestBody" : {
+                         "content": {
+                              "application/json": {
+                                   "schema": {
+                                        "type": "object",
+                                        "properties": {
+                                             "currentPassword": {
+                                                  "type": "string",
+                                                  "minimum": 5,
+                                                  "maximum": 255,
+                                                  "required": false
+                                             },
+                                             "password": {
+                                                  "type": "string",
+                                                  "minimum": 5,
+                                                  "maximum": 255,
+                                                  "required": false
+                                             }
+                                        }
+                                   },
+                                   "example": {
+                                        "currentPassword": "Examplecurrentpassword123",
+                                        "newPassword": "Examplenewpassword456"
+                                   }
+                              }
+                         }
+                    },
+                    "responses": {
+                         "200": {
+                              "description": "Successful change password profile",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": true,
+                                             "message": "User data updated successfully",
+                                             "data": {
+                                                  "username": "exampleusername",
+                                                  "email": "example@example.com"
+                                             }
+                                        }
+                                   }
+                              }
+                         },
+                         "400": {
+                              "description": "Bad request: Incorrect current password",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Incorrect current password",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "401": {
+                              "description": "Unauthorized: Missing or invalid token",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Access denied",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "403": {
+                              "description": "Bad Request: Validation failed",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Validation failed. Please check your input.",
+                                             "errors": [
+                                                  {
+                                                       "path": "username",
+                                                       "message": "String must contain at least 5 character"
+                                                  },
+                                                  {
+                                                       "path": "email",
+                                                       "message": "Invalid input must end with '.com'"
+                                                  }
+                                             ]
+                                        }
+                                   }
+                              }
+                         },
+                         "500": {
+                              "description": "Internal Server Errors",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Internal server errors",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         }
+                    }
+               }
+          }
+     }
+}
