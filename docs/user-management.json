@@ -1,4 +1,4 @@
-{
+ {
      "openapi":"3.0.2",
      "info": {
           "version":"1.0",
@@ -62,9 +62,11 @@
                                              "success": true,
                                              "message": "Register successfully",
                                              "data": {
+                                                  "id": 1,
                                                   "username": "exampleusername",
                                                   "email": "example@example.com"
-                                             }
+                                             },
+                                             "errors": {}
                                         }
                                    }
                               }
@@ -101,7 +103,8 @@
                                    "application/json": {
                                         "example": {
                                              "success": false,
-                                             "message": "User already exists",
+                                             "message": "Rejected to create a User",
+                                             "errors": "User already exists",
                                              "data": {}
                                         }
                                    }
@@ -113,7 +116,8 @@
                                    "application/json":{
                                         "example": {
                                              "success": false,
-                                             "message": "Internal server errors",
+                                             "message": "Server errors",
+                                             "errors": "Internal Server Errors",
                                              "data": {}
                                         }
                                    }
@@ -139,13 +143,13 @@
                                                   "type": "string",
                                                   "minimum": 5,
                                                   "maximum": 255,
-                                                  "required": [true]
+                                                  "required": true
                                              },
                                              "password": {
                                                   "type": "string",
                                                   "minimum": 5,
                                                   "maximum": 255,
-                                                  "required": [true]
+                                                  "required": true
                                              }
                                         }
                                    },
@@ -174,9 +178,11 @@
                                              "success": true,
                                              "message": "User logged in successfully",
                                              "data": {
+                                                  "id": 1,
                                                   "username" : "exampleusername",
                                                   "email": "example@example.com"
-                                             }
+                                             },
+                                             "errors": {}
                                         }
                                    }
                               }
@@ -197,7 +203,8 @@
                                                        "path": "password",
                                                        "message": "String must contain at lesat 5 character"
                                                   }
-                                             ]
+                                             ],
+                                             "data": {}
                                         }
                                    }
                               }
@@ -208,7 +215,8 @@
                                    "application/json": {
                                         "example": {
                                              "success": false,
-                                             "message": "Email or password is wrong",
+                                             "message": "Rejected to a login user",
+                                             "errors": "Email or password is wrong",
                                              "data": {}
                                         }
                                    }
@@ -217,10 +225,11 @@
                          "500": {
                               "description": "Internal Server Errors",
                               "content": {
-                                   "application/json": {
+                                   "application/json":{
                                         "example": {
                                              "success": false,
-                                             "message": "Server internal errors",
+                                             "message": "Server errors",
+                                             "errors": "Internal Server Errors",
                                              "data": {}
                                         }
                                    }
@@ -250,16 +259,18 @@
                     ],
                     "responses": {
                          "200": {
-                              "description": "Successful Get profile",
+                              "description": "Successfully Get profile",
                               "content": {
                                    "application/json": {
                                         "example": {
                                              "success": true,
                                              "message": "User data retrieved successfully",
                                              "data": {
+                                                  "id": 1,
                                                   "username": "exampleusername",
                                                   "email": "example@example.com"
-                                             }
+                                             },
+                                             "errors": {}
                                         }
                                    }
                               }
@@ -271,6 +282,7 @@
                                         "example": {
                                              "success": false,
                                              "message": "Access denied",
+                                             "errors": "Missing or invalid token",
                                              "data": {}
                                         }
                                    }
@@ -279,10 +291,11 @@
                          "500": {
                               "description": "Internal Server Errors",
                               "content": {
-                                   "application/json": {
+                                   "application/json":{
                                         "example": {
                                              "success": false,
-                                             "message": "Server internal errors",
+                                             "message": "Server errors",
+                                             "errors": "Internal Server Errors",
                                              "data": {}
                                         }
                                    }
@@ -340,11 +353,12 @@
                                    "application/json": {
                                         "example": {
                                              "success": true,
-                                             "message": "User data updated successfully",
+                                             "message": "User updated successfully",
                                              "data": {
                                                   "username": "newusername",
                                                   "email": "newemail@example.com"
-                                             }
+                                             },
+                                             "errors": {}
                                         }
                                    }
                               }
@@ -356,6 +370,7 @@
                                         "example": {
                                              "success": false,
                                              "message": "Access denied",
+                                             "errors": "Missing or invalid token",
                                              "data": {}
                                         }
                                    }
@@ -377,7 +392,8 @@
                                                        "path": "email",
                                                        "message": "Invalid input must end with '.com'"
                                                   }
-                                             ]
+                                             ],
+                                             "data": {}
                                         }
                                    }
                               }
@@ -385,10 +401,11 @@
                          "500": {
                               "description": "Internal Server Errors",
                               "content": {
-                                   "application/json": {
+                                   "application/json":{
                                         "example": {
                                              "success": false,
-                                             "message": "Internal server errors",
+                                             "message": "Server errors",
+                                             "errors": "Internal Server Errors",
                                              "data": {}
                                         }
                                    }
@@ -402,7 +419,7 @@
           "/api/v1/users/change-password": {
                "put": {
                     "tags": ["User Management"],
-                    "summary": "Change password User Profile",
+                    "summary": "Change Password User Profile",
                     "description": "Endpoint to change password user profile data.",
                     "parameters": [
                          {
@@ -444,16 +461,18 @@
                     },
                     "responses": {
                          "200": {
-                              "description": "Successful change password profile",
+                              "description": "Successfully change password profile",
                               "content": {
                                    "application/json": {
                                         "example": {
                                              "success": true,
-                                             "message": "User data updated successfully",
+                                             "message": "Password updated successfully",
                                              "data": {
+                                                  "id": 1,
                                                   "username": "exampleusername",
                                                   "email": "example@example.com"
-                                             }
+                                             },
+                                             "erros": {}
                                         }
                                    }
                               }
@@ -464,7 +483,8 @@
                                    "application/json": {
                                         "example": {
                                              "success": false,
-                                             "message": "Incorrect current password",
+                                             "message": "Rejected to change password",
+                                             "errors": "Incorrect current password",
                                              "data": {}
                                         }
                                    }
@@ -477,6 +497,7 @@
                                         "example": {
                                              "success": false,
                                              "message": "Access denied",
+                                             "errors": "Missing or invalid token",
                                              "data": {}
                                         }
                                    }
@@ -498,7 +519,8 @@
                                                        "path": "email",
                                                        "message": "Invalid input must end with '.com'"
                                                   }
-                                             ]
+                                             ],
+                                             "data": {}
                                         }
                                    }
                               }
@@ -506,10 +528,11 @@
                          "500": {
                               "description": "Internal Server Errors",
                               "content": {
-                                   "application/json": {
+                                   "application/json":{
                                         "example": {
                                              "success": false,
-                                             "message": "Internal server errors",
+                                             "message": "Server errors",
+                                             "errors": "Internal Server Errors",
                                              "data": {}
                                         }
                                    }

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
 import { ResponseError } from "../error/response-error";
+import { HttpResponseDispatcher } from "../util/sendJsonResponsUtil";
 
 export function errorMiddleware(error: Error, request: Request, response: Response, next: NextFunction): void {
      // Handle jika error adalah ZodError
@@ -9,14 +10,14 @@ export function errorMiddleware(error: Error, request: Request, response: Respon
                { path: issue.path.join("."), message: issue.message }
           ));
 
-          response.status(403).json({ success: false, message: "Validation failed. Please check your input.", errors: handleIssueZod, data: {} });
+          HttpResponseDispatcher.dispatchJsonResponse(response, 403, "Validation failed. Please check your input.", {}, handleIssueZod);
      }
 
      // Handle jika error adalah ResponseError
      if (error instanceof ResponseError) {
-          response.status(error.status).json({ success: false, message: error.message, data: {} });
+          HttpResponseDispatcher.dispatchJsonResponse(response, error.status, error.message, {}, error.errors)
      }
 
      // Berikan response 500 jika sebuah error tidak diketaui
-     response.status(500).json({ success: false, message: "Server internal errors" });
+     HttpResponseDispatcher.dispatchJsonResponse(response, 500, "Server erorrs", {}, "Server internal errors");
 }

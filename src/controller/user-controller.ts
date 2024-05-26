@@ -1,79 +1,101 @@
 import { NextFunction, Request, Response } from "express";
-import { UserOperationOutcome } from "../model/user-management";
+import { ChangePasswordRequest, UpdateRequest, UserOperationOutcome } from "../model/user-management";
 import { ResponseError } from "../error/response-error";
 import { UserService } from "../service/user-service";
 import jwt from 'jsonwebtoken';
 import { RequestUserValidator } from "../types/request-middleware";
 import { ZodError } from "zod";
+import { HttpResponseDispatcher } from "../util/sendJsonResponsUtil";
 
 export class UserController {
-
-     static async submitRegistration(request: Request, response: Response, next: NextFunction): Promise<void> {
+     public static async submitRegister(request: Request, response: Response, next: NextFunction): Promise<void> {
           try {
-               // Panggil layanan untuk prosess registration user, dan tunggu konfirmasi
-               const submitUserRegistrationConfirmation: UserOperationOutcome | ResponseError | ZodError = 
-                    await UserService.registration(request.body);
+               // Panggil layanan untuk prosess user register dengan mengirim request body yang diberikan
+               const submitRegisterConfirmation: UserOperationOutcome | ResponseError | ZodError = 
+                    await UserService.register(request.body);
 
-               // Jika berhasil, kirim respons 200 serta data hasil yang diberikan
-               response.status(200).json({ success: true, message: "Register successfully", data: submitUserRegistrationConfirmation });
+               // Kirim respon sukses dengan status 200 dengan hasil dari proses register
+               HttpResponseDispatcher
+                    .dispatchJsonResponse(response, 200, "Register successfully", submitRegisterConfirmation, {});
           } catch (error) {
-               next(error); // Jika bermasalah, lewatkan error ke middleware selanjutnya
+               next(error); // Jika errors, lewatkan error ke middleware selanjutnya
           }
      }
 
-     static async submitLogin(request: Request, response: Response, next: NextFunction): Promise<void> {
+     public static async submitLogin(request: Request, response: Response, next: NextFunction): Promise<void> {
           try {
-               // Panggil layanan untuk prosess login user, dan tunggu konfirmasi
+               // Panggil layanan untuk proses users login dengan mengirim request body yang diberikan
                const submitUserLoginConfirmation: UserOperationOutcome | ResponseError | ZodError = 
                     await UserService.login(request.body);
 
-               // Jika berhasil, buat token JWT dengan data hasil dari konfirmasi login, serta atur kedaluwarsa
+               // Buat token JWT dengan data hasil dari proses users login, serta atur kedaluwarsa
                const createToken: string = jwt.sign({ ...submitUserLoginConfirmation }, process.env.TOKEN_SECRET_KEY!, 
                     { expiresIn: process.env.EXPIRES_IN! });
 
                // Atur cookie dengan token JWT untuk otentikasi
-               response.cookie("login", createToken, { httpOnly: true, secure: true, sameSite: "strict" })
-               .status(200).json({ success: true, message: "User logged in successfully", data: submitUserLoginConfirmation });
+               response.cookie("login", createToken, { httpOnly: true, secure: true, sameSite: "strict" });
+
+               // Kirim respons suksess dengan status 200 dengan hasil dari proses login
+               HttpResponseDispatcher
+                    .dispatchJsonResponse(response, 200, "User logged in successfully", submitUserLoginConfirmation, {});
           } catch (error) {
-               next(error); // Jika bermasalah, lewatkan error ke middleware selanjutnya
+               next(error); // Jika errors, lewatkan error ke middleware selanjutnya
           }
      }
 
-     static async submitGetProfile(request: RequestUserValidator, response: Response, next: NextFunction): Promise<void> {
+     public static async submitGetProfile(request: RequestUserValidator, response: Response, next: NextFunction): Promise<void> {
           try {
-               // Panggil layanan untuk proses dapatkan data user, dan nunggu konfirmasi
-               const submitGetProfileUserConfirmation: UserOperationOutcome = await UserService.getProfile(request.user!);
+               // Panggil layanan untuk proses get profile dengan mengirim request user yang diberikan
+               const submitGetProfileUserConfirmation: UserOperationOutcome = 
+                    await UserService.getProfile(request.user!);
 
-               // Jika berhasil, kirim respons 200 serta data yang di berikan
-               response.status(200).json({ success: true, message: "User data retrieved successfully", data: submitGetProfileUserConfirmation });
+               // Kirim respon sukses dengan status 200 serta hasil dari operasi get profile
+               HttpResponseDispatcher
+                    .dispatchJsonResponse(response, 200, "User data retrieved successfully", submitGetProfileUserConfirmation, {});
           } catch (error) {
-               next(error); // Jika bermasalah, lewatkan error ke middleware selanjutnya
+               next(error); // Jika errors, lewatkan error ke middleware selanjutnya
           }
      }
 
-     static async submitUpdateProfile(request: RequestUserValidator, response: Response, next: NextFunction): Promise<void> {
+     public static async submitUpdateProfile(request: RequestUserValidator, response: Response, next: NextFunction): Promise<void> {
           try {
-               // Panggil layanan untuk proses update data user, dan nunggu konfirmasi
-               const submitUpdateUserConfirmation: UserOperationOutcome | ZodError = 
-                    await UserService.updateProfile(request.user! ,request.body);
+               // Mengkonstruksi objek UpdateRequest dari request body yang diberikan
+               const updateProfileRequest: UpdateRequest = {
+                    id: request.user?.id!,
+                    ...request.body,
+               }
 
-               // Jika berhasil, kirim respons 200 serta data yang telah di update dari konfirmasi
-               response.status(200).json({ success: true, message: "User data updated successfully", data: submitUpdateUserConfirmation });
+               // Panggil layanan untuk proses update profile dengan mengirim objek UpdateRequest
+               const submitUpdateProfileConfirmation: UserOperationOutcome | ZodError = 
+                    await UserService.updateProfile(updateProfileRequest);
+
+               // Kirim respon sukses dengan status 200 serta hasil dari operasi update profile
+               HttpResponseDispatcher
+                    .dispatchJsonResponse(response, 200, "User updated successfully", submitUpdateProfileConfirmation, {});
           } catch (error) {
-               next(error); // Jika bermasalah, lewatkan error ke middleware selanjutnya
+               console.info(error);
+               next(error); // Jika errors, lewatkan error ke middleware selanjutnya
           }
      }
 
-     static async submitChangePassword(request: RequestUserValidator, response: Response, next: NextFunction): Promise<void> {
+     public static async submitChangePassword(request: RequestUserValidator, response: Response, next: NextFunction): Promise<void> {
           try {
-               // Panggil layanan untuk proses ganti password user, dan nunggu konfirmasi
+               // Mengkonstruksi objek ChangePassword dari request body yang diberikan
+               const changePwRequest: ChangePasswordRequest = {
+                    userId: request.user?.id!,
+                    oldPassword: request.user?.password!,
+                    currentPassword: request.body.currentPassword,
+                    newPassword: request.body.newPassword
+               }
+               // Panggil layanan untuk proses update password dengan mengirim objek ChangePassword
                const submitChangePasswordUserConfirmation: UserOperationOutcome | ResponseError | ZodError = 
-                    await UserService.changePassword(request.user!, request.body);
+                    await UserService.changePassword(changePwRequest);
 
-               // Jika berhasil, kirim response 200 serta data password baru yang telah di update
-               response.status(200).json({ success: 200, message: "User password updated successfully", data: submitChangePasswordUserConfirmation });
+               // Kirim respon sukses dengan status 200 serta hasil dari operasi perubahan password
+               HttpResponseDispatcher
+                    .dispatchJsonResponse(response, 200, "Password updated successfully", submitChangePasswordUserConfirmation, {});
           } catch (error) {
-               next(error); // Jika bermasalah, lewatkan error ke middleware selanjutnya
+               next(error); // Jika errors, lewatkan error ke middleware selanjutnya
           }
      }
 
