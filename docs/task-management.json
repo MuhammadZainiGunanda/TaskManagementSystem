@@ -1,0 +1,868 @@
+{
+     "openapi":"3.0.2",
+     "info": {
+          "version":"1.0",
+          "title":"Task Management System RESTful API",
+          "contact": {
+               "name": "Muhammad Zaini Gunanda",
+               "email": "muhammadzainigunanda@gmail.com"
+          }
+     },
+     "servers": [
+          {
+               "url":"http://localhost:3000/"
+          }
+     ],
+     "paths": {
+          "/api/v1/tasks": {
+               "post": {
+                    "tags": ["Task Management"],
+                    "summary": "Created a Task",
+                    "description": "Endpoint to created a new tasks",
+                    "parameters": [
+                         {
+                              "name": "Authorization",
+                              "in": "header",
+                              "description": "JWT token for Authentication",
+                              "required": true,
+                              "schema": {
+                                   "type": "string"
+                              }
+                         }
+                    ],
+                    "requestBody": {
+                         "content": {
+                              "application/json": {
+                                   "schema": {
+                                        "type": "object",
+                                        "properties": {
+                                             "title": {
+                                                  "required": true,
+                                                  "type": "string",
+                                                  "maximum": 255,
+                                                  "minimum": 1
+                                             },
+                                             "description": {
+                                                  "required": false,
+                                                  "type": "string",
+                                                  "maximum": "500"
+                                             },
+                                             "dueData": {
+                                                  "required": true,
+                                                  "description": "String of number timestamp Unix Epoch",
+                                                  "type": "string", 
+                                                  "maximum": 30
+                                             },
+                                             "status": {
+                                                  "required": true,
+                                                  "description": "string of Enum",
+                                                  "type": "string",
+                                                  "enum": ["TODO", "PROGRES", "COMPLETED"]
+                                             }
+                                             
+                                        }
+                                   },
+                                   "example": {
+                                        "title": "Title of Task",
+                                        "description": "Description of Task",
+                                        "dueData": "1716646162267",
+                                        "status": "PROGRESS"
+                                   }
+                              }
+                         }
+                    },
+                    "responses": {
+                         "200": {
+                              "description": "Successfully created Task",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": true,
+                                             "message": "Create task successfully",
+                                             "data": {
+                                                  "id": 1,
+                                                  "title": "Task 1",
+                                                  "description": "Description of Task 1",
+                                                  "dueData": 1716642989009,
+                                                  "status": "PROGRESS"
+                                             },
+                                             "errors": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "401": {
+                              "description": "Unauthorized: Missing or invalid token",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Access denied",
+                                             "errors": "Missing or invalid token",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "403": {
+                              "description": "Bad Request: Validation failed",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Validation failed. Please check your input.",
+                                             "errors": [
+                                                  {
+                                                       "path": "title",
+                                                       "message": "String must contain at least 1 character(s)"
+                                                  },
+                                                  {
+                                                       "path": "status",
+                                                       "message": "Invalid enum value. Expected 'TODO' | 'PROGRESS' | 'COMPLETED'"
+                                                  }
+                                             ],
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "500": {
+                              "description": "Internal Server Errors",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Server errors",
+                                             "errors": "Server internal errors",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         }
+                    }
+               },
+
+               "get":{
+                    "tags": ["Task Management"],
+                    "summary": "Get All Task",
+                    "description": "Endpoint to get all logged in user Taks",
+                    "parameters": [
+                         {
+                              "name": "Authorization",
+                              "in": "header",
+                              "description": "JWT token for Authentication",
+                              "required": true,
+                              "schema": {
+                                   "type": "string"
+                              }
+                         }
+                    ],
+                    "responses": {
+                         "200": {
+                              "description": "Successfully get all Task",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": true,
+                                             "message": "Tasks retrieved successfully",
+                                             "data": [
+                                                  {
+                                                       "id": 1,
+                                                       "title": "Title Task 1",
+                                                       "description": "Description of Task 1",
+                                                       "dueData": 1716647985090,
+                                                       "status": "PROGRESS"
+                                                  },
+                                                  {
+                                                       "id": 2,
+                                                       "title": "Title Task 2",
+                                                       "description": "Description of Task 2",
+                                                       "dueData": 1716647985090,
+                                                       "status": "TODO"
+                                                  },
+                                                  {
+                                                       "id": 3,
+                                                       "title": "Title Task 3",
+                                                       "description": "Description of Task 3",
+                                                       "dueData": 1716647985090,
+                                                       "status": "COMPLETED"
+                                                  }
+                                             ],
+                                             "errors": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "401": {
+                              "description": "Unauthorized: Missing or invalid token",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Access denied",
+                                             "errors": "Missing or invalid token",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "404": {
+                              "description": "Bad request: Tasks not found",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "No task found matching the criteria",
+                                             "errors": "Task not found",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "500": {
+                              "description": "Internal Server Errors",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Server errors",
+                                             "errors": "Internal Server Errors",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         }
+                    }
+               }
+          },
+
+          "/api/v1/tasks/{taskId}": {
+               "get": {
+                    "tags": ["Task Management"],
+                    "summary": "Get Task By ID",
+                    "description": "Endpoint to get task details by id",
+                    "parameters": [
+                         {
+                              "name": "Authorization",
+                              "in": "header",
+                              "description": "JWT token for Authentication",
+                              "required": true,
+                              "schema": {
+                                   "type": "string"
+                              }
+                         },
+                         {
+                              "name": "taskId",
+                              "in": "path",
+                              "description": "ID of the Task",
+                              "required": true,
+                              "schema": {
+                                   "type": "integer",
+                                   "format": "int64"
+                              }
+                         }
+                    ],
+                    "responses": {
+                         "200": {
+                              "description": "Successfully retrieved all tasks",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": true,
+                                             "message": "Task retrieved successfully",
+                                             "data": {
+                                                  "id": 1,
+                                                  "title": "Task 1",
+                                                  "description": "Description of Task 1",
+                                                  "dueData": 1716647985090,
+                                                  "status": "PROGRESS"
+                                             },
+                                             "errors": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "404": {
+                              "description": "Bad request: Tasks not found",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "No task found matching the criteria",
+                                             "errors": "Task not found",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "401": {
+                              "description": "Unauthorized: Missing or invalid token",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Access denied",
+                                             "errors": "Missing or invalid token",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "500": {
+                              "description": "Internal Server Errors",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Server errors",
+                                             "errors": "Internal Server Errors",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         }
+                    }
+               },
+
+               "put": {
+                    "tags": ["Task Management"],
+                    "summary": "Update Data Task",
+                    "description": "Endpoint to update task details by id.",
+                    "parameters": [
+                         {
+                              "name": "Authorization",
+                              "in": "header",
+                              "description": "JWT token for Authentication",
+                              "required": true,
+                              "schema": {
+                                   "type": "string"
+                              }
+                         },
+                         {
+                              "name": "taskId",
+                              "in": "path",
+                              "description": "ID of the Task",
+                              "required": true,
+                              "schema": {
+                                   "type": "integer",
+                                   "format": "int64"
+                              }
+                         }
+                    ],
+                    "requestBody": {
+                         "content": {
+                              "application/json": {
+                                   "schema": {
+                                        "type": "object",
+                                        "properties": {
+                                             "title": {
+                                                  "required": false,
+                                                  "type": "string",
+                                                  "maximum": 255,
+                                                  "minimum": 1
+                                             },
+                                             "description": {
+                                                  "required": false,
+                                                  "type": "string",
+                                                  "maximum": "500"
+                                             },
+                                             "dueData": {
+                                                  "required": true,
+                                                  "description": "number of timestamp Unix Epoch",
+                                                  "type": "number", 
+                                                  "maximum": 30
+                                             },
+                                             "status": {
+                                                  "required": true,
+                                                  "description": "string of Enum",
+                                                  "type": "string",
+                                                  "enum": ["TODO", "PROGRES", "COMPLETED"]
+                                             }
+                                        },
+                                        "example": {
+                                             "title": "New Title of Task",
+                                             "description": "New Description of Task",
+                                             "dueData": "1716646162267",
+                                             "status": "COMPLETED"
+                                        }
+                                   }
+                              }
+                         }
+                    },
+                    "responses": {
+                         "200": {
+                              "description": "Successfully update data Task",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": true,
+                                             "message": "Task updated successfully",
+                                             "data": {
+                                                  "id": 1,
+                                                  "title": "New Title Task 1",
+                                                  "description": "New Description of Task 1",
+                                                  "dueData": "1716647985090",
+                                                  "status": "COMPLETED"
+                                             },
+                                             "errors": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "404": {
+                              "description": "Bad request: Task not found",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Rejected to update a task",
+                                             "errors": "Task not found",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "401": {
+                              "description": "Unauthorized: Missing or invalid token",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Access denied",
+                                             "errors": "Missing or invalid token",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "403": {
+                              "description": "Bad Request: Validation failed",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Validation failed. Please check your input.",
+                                             "errors": [
+                                                  {
+                                                       "path": "title",
+                                                       "message": "String must contain at least 1 character(s)"
+                                                  },
+                                                  {
+                                                       "path": "status",
+                                                       "message": "Invalid enum value. Expected 'TODO' | 'PROGRESS' | 'COMPLETED'"
+                                                  }
+                                             ],
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "500": {
+                              "description": "Internal Server Errors",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Server errors",
+                                             "errors": "Internal Server Errors",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         }
+                    }
+               },
+
+               "delete": {
+                    "tags": ["Task Management"],
+                    "summary": "Delete Task By ID",
+                    "description": "Endpoint to delete tasks by ID",
+                    "parameters": [
+                         {
+                              "name": "Authorization",
+                              "in": "header",
+                              "description": "JWT token for Authentication",
+                              "required": true,
+                              "schema": {
+                                   "type": "string"
+                              }
+                         },
+                         {
+                              "name": "taskId",
+                              "in": "path",
+                              "description": "ID of the Task",
+                              "required": true,
+                              "schema": {
+                                   "type": "integer",
+                                   "format": "int64"
+                              }
+                         }
+                    ],
+                    "responses": {
+                         "200": {
+                              "description": "Successfully delete Taks",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": true,
+                                             "message": "Removed task successsfully",
+                                             "data": "OK",
+                                             "errors": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "404": {
+                              "description": "Bad request: Task not found",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Reject to delete a Task",
+                                             "errors": "Task not found",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "401": {
+                              "description": "Unauthorized: Missing or invalid token",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Access denied",
+                                             "errors": "Missing or invalid token",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "500": {
+                              "description": "Internal Server Errors",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Server errors",
+                                             "errors": "Internal Server Errors",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         }
+                    }
+               }
+          },
+
+          "/api/v1/tasks/filter": {
+               "get": {
+                    "tags": ["Task Management"],
+                    "summary": "Get All Taks By Status",
+                    "description": "Endpoint to get all Tasks based on a specific status",
+                    "parameters": [
+                         {
+                              "name": "Authorization",
+                              "in": "header",
+                              "description": "JWT token for Authentication",
+                              "required": true,
+                              "schema": {
+                                   "type": "string"
+                              }
+                         },
+                         {
+                              "name": "status",
+                              "in": "query",
+                              "description": "Status of the Task",
+                              "required": true,
+                              "schema": {
+                                   "type": "string",
+                                   "enum": ["TODO", "PROGRES", "COMPLETED"]
+                              }
+                         }
+                    ],
+                    "responses": {
+                         "200": {
+                              "description": "Successfully retrieved all tasks",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": true,
+                                             "message": "Tasks retrieved successfully",
+                                             "data": [
+                                                  {
+                                                       "id": 1,
+                                                       "title": "Title Task 1",
+                                                       "description": "Description of Task 1",
+                                                       "dueData": "1716647985090",
+                                                       "status": "PROGRESS"
+                                                  },
+                                                  {
+                                                       "id": 2,
+                                                       "title": "Title Task 2",
+                                                       "description": "Description of Task 2",
+                                                       "dueData": "1716647985090",
+                                                       "status": "PROGRESS"
+                                                  },
+                                                  {
+                                                       "id": 3,
+                                                       "title": "Title Task 3",
+                                                       "description": "Description of Task 3",
+                                                       "dueData": "1716647985090",
+                                                       "status": "PROGRESS"
+                                                  }
+                                             ],
+                                             "errors": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "401": {
+                              "description": "Unauthorized: Missing or invalid token",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Access denied",
+                                             "errors": "Missing or invalid token",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "400": {
+                              "description": "Bad request: The status query parameter is invalid",
+                              "content": {
+                                   "application/json": {
+                                        "examples": {
+                                             "invalidStatusQueryParameter": {
+                                                  "summary": "Invalid status query parameter",
+                                                  "value": {
+                                                       "success": false,
+                                                       "message": "Invalid status query parameter",
+                                                       "errors": "The status parameter must be one of the following values: TODO, PROGRESS, COMPLETED",
+                                                       "data": {}
+                                                  }
+                                             }
+                                        }
+                                   }
+                              }
+                         },
+                         "500": {
+                              "description": "Internal Server Errors",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Server errors",
+                                             "errors": "Internal Server Errors",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         }
+                    }                    
+               }
+          },
+
+          "/api/v1/{tasks}": {
+               "get": {
+                    "tags": ["Task Management"],
+                    "summary": "Get All Taks By DueDate",
+                    "description": "Endpoint to get all tasks sorted by dueDate.",
+                    "parameters": [
+                         {
+                              "name": "Authorization",
+                              "in": "header",
+                              "description": "JWT token for Authentication",
+                              "required": true,
+                              "schema": {
+                                   "type": "string"
+                              }
+                         },
+                         {
+                              "name": "sortBy",
+                              "in": "query",
+                              "description": "Field to sort by. Default is 'dueDate'.",
+                              "required": false,
+                              "schema": {
+                                   "type": "string",
+                                   "default": "dueDate"
+                              }
+                         },
+                         {
+                              "name": "order",
+                              "in": "query",
+                              "description": "Order of sorting: 'asc' for ascending, 'desc' for descending. Default is 'asc'.",
+                              "required": true,
+                              "schema": {
+                                   "type": "string",
+                                   "enum": ["acs", "desc"],
+                                   "default": "acs"
+                              }
+                         }
+                    ],
+                    "responses": {
+                         "200": {
+                              "description": "Successfully retrieved all tasks",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": true,
+                                             "message": "Tasks retrieved successfully",
+                                             "data": [
+                                                  {
+                                                       "id": 1,
+                                                       "title": "Title Task 1",
+                                                       "description": "Description of Task 1",
+                                                       "dueData": "1716647985090",
+                                                       "status": "PROGRESS"
+                                                  },
+                                                  {
+                                                       "id": 2,
+                                                       "title": "Title Task 2",
+                                                       "description": "Description of Task 2",
+                                                       "dueData": "1716647985090",
+                                                       "status": "TODO"
+                                                  },
+                                                  {
+                                                       "id": 3,
+                                                       "title": "Title Task 3",
+                                                       "description": "Description of Task 3",
+                                                       "dueData": "1716647985090",
+                                                       "status": "PROGRESS"
+                                                  }
+                                             ],
+                                             "errors": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "401": {
+                              "description": "Unauthorized: Missing or invalid token",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Access denied",
+                                             "errors": "Missing or invalid token",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "404": {
+                              "description": "Bad request: Tasks not found",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "No task found matching the criteria",
+                                             "errors": "Task not found",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "500": {
+                              "description": "Internal Server Errors",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Server errors",
+                                             "errors": "Internal Server Errors",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         }
+                    }
+               }
+          },
+
+          "/api/v1/tasks/assign": {
+               "get": {
+                    "tags": ["Task Management"],
+                    "summary": "Assign Task to User",
+                    "description": "Endpoint for assigning specific tasks to users with specific IDs.",
+                    "parameters": [
+                         {
+                              "name": "Authorization",
+                              "in": "header",
+                              "description": "JWT token for Authentication",
+                              "required": true,
+                              "schema": {
+                                   "type": "string"
+                              }
+                         }
+                    ],
+                    "responses": {
+                         "200": {
+                              "description": "Successfully retrieved all tasks",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": true,
+                                             "message": "Tasks retrieved successfully",
+                                             "data": {
+                                                       "id": 1,
+                                                       "title": "Title Task 1",
+                                                       "description": "Description of Task 1",
+                                                       "dueData": "1716647985090",
+                                                       "status": "PROGRESS"
+                                             },
+                                             "errors": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "401": {
+                              "description": "Unauthorized: Missing or invalid token",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Access denied",
+                                             "errors": "Missing or invalid token",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         },
+                         "400": {
+                              "description": "Bad request: Task not found",
+                              "content": {
+                                   "application/json": {
+                                        "examples": {
+                                             "invalidStatusQueryParameter": {
+                                                  "summary": "Invalid status query parameter",
+                                                  "value": {
+                                                       "success": false,
+                                                       "message": "No task found matching the criteria",
+                                                       "errors": "Task not found",
+                                                       "data": {}
+                                                  }
+                                             }
+                                        }
+                                   }
+                              }
+                         },
+                         "500": {
+                              "description": "Internal Server Errors",
+                              "content": {
+                                   "application/json": {
+                                        "example": {
+                                             "success": false,
+                                             "message": "Server errors",
+                                             "errors": "Internal Server Errors",
+                                             "data": {}
+                                        }
+                                   }
+                              }
+                         }
+                    }
+               }
+          }
+     } 
+}

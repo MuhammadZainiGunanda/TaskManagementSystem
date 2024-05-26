@@ -1,37 +1,41 @@
 import { User } from "@prisma/client";
 
-// Representasi hasil operasi terkait user
+// Representasi rules format out come operasi
 export type UserOperationOutcome = {
-     username: string;
-     email: string;
+     readonly id: number;
+     readonly username: string;
+     readonly email: string;
 }
 
 // Request untuk user register
-export type RegistrationRequest = {
-     username: string;
-     email: string;
-     password: string;
+export type RegisterRequest = {
+     readonly username: string;
+     readonly email: string;
+     readonly password: string;
 }
 
 // Request untuk user login
 export type LoginRequest = {
-     email: string;
-     password: string;
+     readonly email: string;
+     readonly password: string;
 }
 
 // Request untuk user update
 export type UpdateRequest = {
-     username: string;
-     email: string;
+     readonly id: number;
+     readonly username: string;
+     readonly email: string;
 }
 
 // Request untuk ganti password
 export type ChangePasswordRequest = {
-     currentPassword: string;
-     newPassword: string;
+     readonly userId: number;
+     readonly oldPassword: string;
+     readonly currentPassword: string;
+     readonly newPassword: string;
 }
 
-// Representasi untuk konversi user payload, menjadi hasil operasi user
+// Representasi untuk konversi user payload, ke format yang sesuai
 export function convertToUserResponseOutcome(userPayload: User): UserOperationOutcome {
-     return { username: userPayload.username, email: userPayload.email };
+     return { id: userPayload.id, username: userPayload.username, email: userPayload.email };
 }

@@ -34,7 +34,7 @@ model Task {
   id          Int       @id @default(autoincrement())
   title       String    @db.VarChar(255)
   description String?   @db.Text
-  dueDate     DateTime  @db.Date()
+  dueDate     String    @db.VarChar(30)
   status      Status    @default(PROGRESS)
 
   user_id     Int

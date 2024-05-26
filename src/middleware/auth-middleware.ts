@@ -3,6 +3,7 @@ import { RequestUserValidator } from "../types/request-middleware";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { User } from "@prisma/client";
 import { prismaClient } from "../app/database";
+import { HttpResponseDispatcher } from "../util/sendJsonResponsUtil";
 
 export async function authenticationMiddleware(request: RequestUserValidator, response: Response, next: NextFunction): Promise<void> {
      // Access token dari cookie
@@ -21,7 +22,7 @@ export async function authenticationMiddleware(request: RequestUserValidator, re
 
                // Jika data user tidak ditemukan di database, berikan ResponseError
                if (!fetchUserByTokenUsername) {
-                    response.status(401).json({ success: false, message: "Access denied", data: {} });
+                    HttpResponseDispatcher.dispatchJsonResponse(response, 401, "Access denied", {}, "Missing or invalid token");
                }
 
                // Jika data user ditemukan, tambahkan payload user ke dalam objek request dan melanjutkan ke middelware selanjutnya
@@ -29,10 +30,10 @@ export async function authenticationMiddleware(request: RequestUserValidator, re
                next();
           } catch (error) {
                // Jika terjadi kesalahan dalam verifikasi token, berikan ResponseError
-               response.status(401).json({ success: false, message: "Access denied", data: {} });
+               HttpResponseDispatcher.dispatchJsonResponse(response, 401, "Access denied", {}, "Missing or invalid token");
           }
      } else {
           // Jika token tidak ada, berikan ResponseError
-          response.status(401).json({ success: false, message: "Access denied", data: {} });
+          HttpResponseDispatcher.dispatchJsonResponse(response, 401, "Access denied", {}, "Missing or invalid token");
      }
 }
