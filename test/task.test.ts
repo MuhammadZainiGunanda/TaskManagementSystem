@@ -627,7 +627,7 @@ describe("Test delete Task operation -> DELETE /api/v1/tasks/:taskId(\\d+)", ():
           if (getTask) {
                const remove: Response = await supertest(webApplicaiton)
                     .delete(`/api/v1/tasks/${getTask?.id + 1}`)
-                    .set("Cookie", `sakah`)
+                    .set("Cookie", `salah`)
 
                console.info(remove.body);
 
